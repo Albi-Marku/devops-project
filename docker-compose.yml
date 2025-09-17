@@ -3,22 +3,31 @@ version: "3.9"
 services:
   app:
     build: .
+    container_name: getting-started-app-app
     ports:
       - "3000:3000"
+    environment:
+      # These env vars tell your app how to connect to Postgres
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: user
+      DB_PASSWORD: password
+      DB_NAME: todos
     depends_on:
       - db
-    environment:
-      - DATABASE_URL=postgres://postgres:password@db:5432/tododb
 
   db:
     image: postgres:15
+    container_name: getting-started-app-db
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: newpass123!@
-      POSTGRES_DB: tododb
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: Secrets123!?
+      POSTGRES_DB: todos
+    ports:
+      - "5432:5432"   # makes DB accessible on localhost:5432
     volumes:
-      - todo-db-data:/var/lib/postgresql/data
+      - db-data:/var/lib/postgresql/data
 
 volumes:
-  todo-db-data:
+  db-data:
