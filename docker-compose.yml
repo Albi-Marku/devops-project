@@ -15,7 +15,7 @@ services:
     restart: always
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_PASSWORD: newpass123!@
       POSTGRES_DB: tododb
     volumes:
       - todo-db-data:/var/lib/postgresql/data
