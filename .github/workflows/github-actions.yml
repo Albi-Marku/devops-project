@@ -19,13 +19,15 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18' # or your app’s version
+          node-version: '18' 
 
       - name: Install dependencies
         run: npm install
 
-      - name: Run tests
+      - name: Run tests (with writable DB path)
         run: npm test
+        env:
+          DB_FILE: /tmp/todos/todos.db   # Override location for CI
 
       - name: Build application
         run: npm run build
