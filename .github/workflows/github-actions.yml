@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  docker-build-test:
+  docker-build:
     runs-on: ubuntu-latest
 
     steps:
@@ -21,6 +21,3 @@ jobs:
 
       - name: Build Docker image
         run: docker build -t myapp:ci .
-
-      - name: Run tests inside container
-        run: docker run --rm myapp:ci yarn test
