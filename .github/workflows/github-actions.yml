@@ -23,6 +23,23 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      # Run all Jest tests except sqlite persistence
-      - name: Run Jest tests (skip sqlite persistence)
-        run: yarn jest --runInBand --testPathIgnorePatterns=spec/persistence/sqlite.spec.js
+      - name: Cache Jest cache
+        uses: actions/cache@v4
+        with:
+          path: .jest-cache
+          key: ${{ runner.os }}-jest-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-jest-
+
+      # Run full suite on push to main
+      - name: Run full Jest tests (skip sqlite persistence)
+        if: github.event_name == 'push'
+        run: yarn jest --ci --cache --cacheDirectory=.jest-cache --testPathIgnorePatterns=spec/persistence/sqlite.spec.js
+
+      # Run only changed tests on pull requests
+      - name: Run Jest only for changed files (skip sqlite persistence)
+        if: github.event_name == 'pull_request'
+        run: |
+          yarn jest --ci --cache --cacheDirectory=.jest-cache \
+            --testPathIgnorePatterns=spec/persistence/sqlite.spec.js \
+            --findRelatedTests $(git diff --name-only origin/main...HEAD)
