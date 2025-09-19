@@ -9,7 +9,7 @@ services:
       NODE_ENV: development
       DATABASE_PATH: /data/todo.db
     volumes:
-      - todo-db:/data    # Persist the SQLite DB in a clearer location
+      - todo-db:/etc/todos    # Persist the SQLite DB in a clearer location
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
       interval: 30s
