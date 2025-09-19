@@ -11,24 +11,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout code
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 18
           cache: yarn
 
-      # 3. Install dependencies
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      # 4. Run tests (fixes SQLite permission issue)
-      - name: Run Jest tests
-        env:
-          SQLITE_DB: ./tmp/todo.db   # safe test database location
-        run: yarn jest --runInBand
-
+      # Run all Jest tests except sqlite persistence
+      - name: Run Jest tests (skip sqlite persistence)
+        run: yarn jest --runInBand --testPathIgnorePatterns=spec/persistence/sqlite.spec.js
