@@ -1,19 +1,21 @@
-# Simple production Dockerfile
-FROM node:lts-alpine
-
+# Stage 1: builder
+FROM node:lts-alpine AS builder
 WORKDIR /app
 
-# Install dependencies
+# Install only production dependencies first (better layer caching)
 COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile --production
-
-# Copy source
+RUN yarn install
+# Copy source code
 COPY . .
 
-# Create a writable data folder for SQLite
-RUN mkdir -p /app/data && chown -R node:node /app
+# Stage 2: runtime
+FROM node:lts-alpine AS runtime
+WORKDIR /app
 
-USER node
+# Copy only production node_modules from builder
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/src ./src
+COPY --from=builder /app/package.json ./
 
 EXPOSE 3000
 CMD ["node", "src/index.js"]
