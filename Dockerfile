@@ -2,7 +2,7 @@
 FROM node:lts-alpine AS builder
 WORKDIR /app
 
-# Install only production dependencies first (better layer caching)
+# Install all deps (including dev, needed for build)
 COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile --production=false
 
@@ -13,15 +13,17 @@ COPY . .
 FROM node:lts-alpine AS runtime
 WORKDIR /app
 
-# Copy only production node_modules from builder
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/src ./src
+# Copy only package files first
 COPY --from=builder /app/package.json ./
+COPY --from=builder /app/yarn.lock ./
 
-# Drop dev dependencies to slim down image
-RUN yarn install --frozen-lockfile --production --ignore-scripts --prefer-offline
+# Install *production* deps directly in runtime (ensures sqlite3 compiles here)
+RUN yarn install --frozen-lockfile --production
 
-# Set non-root user for security
+# Copy app source (but NOT node_modules from builder)
+COPY --from=builder /app/src ./src
+
+# Security: drop root
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 USER appuser
 
