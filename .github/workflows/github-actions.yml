@@ -40,6 +40,12 @@ jobs:
         if: github.event_name == 'push'
         run: yarn jest --ci --cache --cacheDirectory=.jest-cache --testPathIgnorePatterns=spec/persistence/sqlite.spec.js
 
+      # Ensure main branch is available for git diff
+      - name: Fetch main branch
+        if: github.event_name == 'pull_request'
+        run: git fetch origin main:refs/remotes/origin/main
+
+
       # Run only changed tests on pull requests
       - name: Run Jest only for changed files (skip sqlite persistence)
         if: github.event_name == 'pull_request'
