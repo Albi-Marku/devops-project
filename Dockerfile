@@ -12,6 +12,9 @@ COPY . .
 FROM node:lts-alpine AS runtime
 WORKDIR /app
 
+# Install curl for healthcheck
+RUN apk add --no-cache curl
+
 # Copy only production node_modules from builder
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/src ./src
