@@ -1,2 +1,8 @@
+
 node_modules
 Dockerfile
+npm-debug.log
+yarn-error.log
+dist
+.git
+.env
